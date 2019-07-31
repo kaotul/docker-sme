@@ -1,0 +1,103 @@
+version: '3.1'
+
+services:
+
+  kaotul_postgres:
+    image: postgres
+    restart: always
+    container_name: "kaotul-db"
+    environment:
+      POSTGRES_PASSWORD: "P@ssw0rd"
+      TZ: "Asia/Bangkok"
+    networks:
+      - odoo_network 
+
+  kaotul_odoo_10:
+    depends_on:
+      - kaotul_postgres
+    image: "odoo:10.0"
+    restart: always
+    container_name: "kaotul-odoo-10"
+    environment:
+      TZ: "Asia/Bangkok"
+      HOST: "kaotul-db"
+      USER: "odoo"
+      PASSWORD: "P@ssw0rd"
+    volumes:
+      - ./config/10:/etc/odoo
+      - odoo10_data:/var/lib/odoo
+      - odoo10_addons:/mnt/extra-addons
+    ports:
+      - 8010:8069
+    networks:
+      - odoo_network
+
+  kaotul_odoo_11:
+    depends_on:
+      - kaotul_postgres
+    image: "odoo:11.0"
+    restart: always
+    container_name: "kaotul-odoo-11"
+    environment:
+      TZ: "Asia/Bangkok"
+      HOST: "kaotul-db"
+      USER: "odoo"
+      PASSWORD: "P@ssw0rd" 
+    volumes:
+      - ./config/11:/etc/odoo
+      - odoo11_data:/var/lib/odoo
+      - odoo11_addons:/mnt/extra-addons     
+    ports:
+      - 8011:8069
+    networks:
+      - odoo_network 
+
+  kaotul_odoo_12:
+    depends_on:
+      - kaotul_postgres
+    image: "odoo:12.0"
+    restart: always
+    container_name: "kaotul-odoo-12"
+    environment:
+      TZ: "Asia/Bangkok"
+      HOST: "kaotul-db"
+      USER: "odoo"
+      PASSWORD: "P@ssw0rd"
+    volumes:
+      - ./config/12:/etc/odoo
+      - odoo12_data:/var/lib/odoo
+      - odoo12_addons:/mnt/extra-addons
+    ports:
+      - 8012:8069
+    networks:
+      - odoo_network 
+        
+  kaotul_pgadmin:
+    depends_on:
+      - kaotul_postgres
+    image: "dpage/pgadmin4"
+    container_name: "kaotul-pgadmin"
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+      PGADMIN_DEFAULT_EMAIL: "kaotul@hotmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "P@ssw0rd" 
+    ports:
+      - 8080:80
+    networks:
+      - odoo_network 
+
+volumes:
+  odoo10_data:
+  odoo10_addons:
+  odoo11_data:
+  odoo11_addons:
+  odoo12_data:
+  odoo12_addons:
+
+networks:
+  odoo_network:
+    driver: bridge
+    ipam: 
+      config:
+      - subnet:   172.32.0.0/24
